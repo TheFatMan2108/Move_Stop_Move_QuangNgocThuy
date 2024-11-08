@@ -16,7 +16,7 @@ public class UI_InGame_Controller : MonoBehaviour,IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         gameOverUI.SetActive(false);
-        GameManager.Instance.BackToMain();
+        GameManager.Instance.OnStopGame();
     }
 
     public void UpdateAlivePeopel(float amount)

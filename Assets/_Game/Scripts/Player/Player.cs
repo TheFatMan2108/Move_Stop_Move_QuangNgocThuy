@@ -1,9 +1,9 @@
-using Unity.VisualScripting;
+﻿using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
-public class Player : CharacterBase, IMaker
+public class Player : CharacterBase, IMaker,IEndGamesable,IStateGame,IChangeName
 {
     public static Player player {  get; private set; }
     public CharacterController controller;
@@ -42,6 +42,9 @@ public class Player : CharacterBase, IMaker
     {
         base.Start();
         controllerState.InstallState(idle);
+        GameManager.Instance.AddEndGamesable(this);
+        GameManager.Instance.AddStateGame(this);
+        GameManager.Instance.AddChangeName(this);
 
     }
 
@@ -151,6 +154,9 @@ public class Player : CharacterBase, IMaker
     private void OnDestroy()
     {
         DisableMove();
+        GameManager.Instance.RemoveEndGamesable(this);
+        GameManager.Instance.RemoveStateGame(this);
+        GameManager.Instance.RemoveChangeName(this);
     }
 
     public void ShowMaker()
@@ -176,16 +182,20 @@ public class Player : CharacterBase, IMaker
     public void SetKillerColor(Color color)=>killedColor = color;
     public override void Dead()
     {
+        if(isDead) return;
         base.Dead();
         controllerState.ChangeState(dead);
+        controller.Move(Vector3.zero);
         controller.enabled = false;
         DisableMove();
+        directionMove = Vector3.zero;
     }
 
     public override void DeadTrigger()
     {
         base.DeadTrigger();
         UI_Manager.instance.UpdateInfoEndGame(GameManager.Instance.GetScore(), nameKilled, killedColor, star, coin);
+        GameManager.Instance.OnEndGame();
     }
 
     public override void UpdateStar(float star)
@@ -199,12 +209,12 @@ public class Player : CharacterBase, IMaker
       coin = Mathf.Floor(coin);
       this.coin += coin;
     }
-    public void SetPosition(Vector3 position,bool isActiveCharacterController,Vector3 direction)
+    public void SetPosition(Vector3 position,bool isActiveCharacterController)
     {
         transform.position = position;
         controller.enabled = isActiveCharacterController;
-        nameTagUI.SetActive(isActiveCharacterController);
-        player.body.localRotation = Quaternion.LookRotation(direction);
+        uICharacter.gameObject.SetActive(isActiveCharacterController);
+        oldDirectionMove = Vector3.back;
         if (isActiveCharacterController)
         {
             EnableMove();
@@ -221,5 +231,36 @@ public class Player : CharacterBase, IMaker
         controller.enabled = true;
         controllerState.ChangeState(idle);
         
+    }
+
+    public void EndGame()
+    {
+        // reset lại kích cỡ
+        size = 1;
+        score = 0;
+        animator.transform.localScale = new Vector3(size, size, size);
+        DisableMove();
+    }
+
+    public void StartGame()
+    {
+        EnableMove();
+        uICharacter.gameObject.SetActive(true);
+    }
+
+    public void StopGame()
+    {
+        DisableMove() ;
+        uICharacter.gameObject.SetActive(false);
+        gameObject.SetActive(true);
+        controller.enabled= false;
+        oldDirectionMove = Vector3.back;
+        controllerState.ChangeState(idle);
+    }
+
+    public void ChangeName(string newName)
+    {
+        nameCharacter = newName;
+        uICharacter.SetName(newName);
     }
 }

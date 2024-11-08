@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IEndGamesable,IStateGame
 {
     public static GameManager Instance { get; private set; }
 
     public List<Transform> startPoints = new List<Transform>();
     public Transform mainMenu;
     public GameObject npcs;
-    public List<ISpawnable> spawnables = new List<ISpawnable>();
+    public HashSet<ISpawnable> spawnables = new HashSet<ISpawnable>();
+    public List<IEndGamesable> endGamesables = new List<IEndGamesable>();
+    public List<IStateGame> states = new List<IStateGame>();
+    public List<IChangeName> changeNames = new List<IChangeName>();
     [Tooltip("Tổng số NPC sẽ xuất hiện")]
     public int npcCount = 10;
     [Tooltip("Số lượng NPC trên bản đồ")]
@@ -22,47 +25,21 @@ public class GameManager : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
         ShowScoreUI();
+        AddEndGamesable(this);
+        AddStateGame(this);
         
     }
     private void Start()
     {
         player = Player.player;
-        player.SetPosition(mainMenu.position, false, new Vector3(0, 0, -1));
+        player.SetPosition(mainMenu.position, false);
 
     }
 
-    public void BackToMain()
-    {
-        // code nay hoi dan can sua lai
-        player.ResetPlayer();
-        player.SetPosition(mainMenu.position, false, new Vector3(0, 0, -1));
-        npcCount = 0;
-        for (int i = 0; i < npcs.transform.childCount; i++)
-        {
-            if (!npcs.transform.GetChild(i).gameObject.activeInHierarchy) continue;
-            npcs.transform.GetChild(i).GetComponent<NPC>().Dead();
-        }
-        npcs.SetActive(false);
-        UI_Manager.instance.UIMainMenu.BackToMainMenu();
-    }
-
-    public void StartGame()
-    {
-        // code nay hoi dan can sua lai
-        player.SetPosition(startPoints[Random.Range(0,startPoints.Count)].position,true,new Vector3(0,0,1));
-        npcs.SetActive(true);
-        player.isDead = false;
-        npcCount = 20;
-        for(int i = 0; i < npcs.transform.childCount; i++)
-        {
-            if(npcs.transform.GetChild(i).gameObject.activeInHierarchy) continue;
-            npcs.transform.GetChild(i).GetComponent<NPC>().Spawn();
-        }
-    }
 
     public void AddSpawn(ISpawnable npc)
     {
-        if (npcCount < 1)
+        if (npcCount < 1&&!player.isDead)
         {
             Debug.Log("Win");
             return;
@@ -70,7 +47,47 @@ public class GameManager : MonoBehaviour
         spawnables.Add(npc);
         SpawnNPC(npc);
     }
-
+    public void OnSpawn()
+    {
+        foreach (var item in spawnables)
+        {
+            item.Spawn();
+        }
+    }
+    public void AddEndGamesable(IEndGamesable endGamesable)=>endGamesables.Add(endGamesable);
+    public void RemoveEndGamesable(IEndGamesable endGamesable)=>endGamesables.Remove(endGamesable);
+    public void OnEndGame()
+    {
+        foreach (var item in endGamesables)
+        {
+            item.EndGame();
+        }
+    }
+    public void AddStateGame(IStateGame stateGame)=>states.Add(stateGame);
+    public void RemoveStateGame(IStateGame stateGame)=>states.Remove(stateGame);
+    public void OnStartGame()
+    {
+        foreach (var item in states)
+        {
+            item.StartGame();
+        }
+    }
+    public void OnStopGame()
+    {
+        foreach (var item in states)
+        {
+            item.StopGame();
+        }
+    }
+    public void AddChangeName(IChangeName changeName)=>changeNames.Add(changeName);
+    public void RemoveChangeName(IChangeName changeName)=>changeNames.Remove(changeName);
+    public void OnChangeName(string changeName)
+    {
+        foreach (var item in changeNames)
+        {
+            item.ChangeName(changeName);
+        }
+    }
     public void SetNPCCount()
     {
         npcCount--;
@@ -99,5 +116,29 @@ public class GameManager : MonoBehaviour
         return npcCount + 1;
     }
     internal void RemoveSpawn(ISpawnable npc) => spawnables.Remove(npc);
+
+    public void EndGame()
+    {
+        npcCount = 0;
+    }
+    private void OnDestroy()
+    {
+        RemoveEndGamesable(this);
+        RemoveStateGame(this);
+    }
+    public void StartGame()
+    {
+        // code nay hoi dan can sua lai
+        player.SetPosition(startPoints[Random.Range(0, startPoints.Count)].position, true);
+        player.isDead = false;
+        npcCount = 20;
+        ShowScoreUI();
+        OnSpawn();
+    }
+    public void StopGame()
+    {
+        player.SetPosition(mainMenu.position, true);
+
+    }
 }
 

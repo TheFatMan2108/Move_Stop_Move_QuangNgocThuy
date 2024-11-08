@@ -3,7 +3,7 @@ using UnityEngine.AI;
 
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class NPC : CharacterBase,IMaker,ISpawnable
+public class NPC : CharacterBase,IMaker,ISpawnable,IEndGamesable,IStateGame
 {
     public GameObject maker;
     public Vector3 spawnPoint = Vector3.zero;
@@ -44,8 +44,10 @@ public class NPC : CharacterBase,IMaker,ISpawnable
         RandomHat();
         RandomPant();
         RandomSkin();
+        GameManager.Instance.AddEndGamesable(this);
+        GameManager.Instance.AddStateGame(this);
+        Dead();
     }
-
     private void AddIndicator()
     {
         indicators = OffscreenIndicator.Instance;
@@ -137,7 +139,6 @@ public class NPC : CharacterBase,IMaker,ISpawnable
         controllerState.ChangeState(idle);
         agent.isStopped = false;
         isDead = false;
-        RamdomWeapon();
         RandomHat();
         RandomPant();
         RandomSkin();
@@ -149,6 +150,8 @@ public class NPC : CharacterBase,IMaker,ISpawnable
     private void OnDestroy()
     {
         GameManager.Instance.RemoveSpawn(this);
+        GameManager.Instance.RemoveEndGamesable(this);
+        GameManager.Instance.RemoveStateGame(this);
     }
     public void RandomHat()
     {
@@ -197,4 +200,23 @@ public class NPC : CharacterBase,IMaker,ISpawnable
         indicators.SetScore(transform);
     }
     public void SetIndicator(OffscreenIndicator.Indicator indicator)=>this.indicator = indicator;
+
+    public void EndGame()
+    {
+        // giảm lại kích thước và điểm
+        score = 0;
+        size = 1;
+        animator.transform.localScale = new Vector3(size, size, size);
+        controllerState.ChangeState(dead);
+    }
+
+    public void StartGame()
+    {
+        Spawn();
+    }
+
+    public void StopGame()
+    {
+        
+    }
 }

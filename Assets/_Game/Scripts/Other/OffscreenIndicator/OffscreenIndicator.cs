@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Canvas))]
-public class OffscreenIndicator : MonoBehaviour
+public class OffscreenIndicator : MonoBehaviour,IEndGamesable
 {
     public static OffscreenIndicator Instance { get; private set; }
     public Camera activeCamera;
@@ -19,6 +19,7 @@ public class OffscreenIndicator : MonoBehaviour
     private void Start()
     {
         InstanIndicator();
+        GameManager.Instance.AddEndGamesable(this);
     }
     private void Update()
     {
@@ -101,6 +102,19 @@ public class OffscreenIndicator : MonoBehaviour
         }
         indicator.rectTransform.eulerAngles = new Vector3(xRote, yRote,0);
     }
+
+    public void EndGame()
+    {
+        foreach (var item in targetIndicators)
+        {
+            item.indicatorUI.gameObject.SetActive(false);
+        }
+    }
+    private void OnDestroy()
+    {
+        GameManager.Instance.RemoveEndGamesable(this);
+    }
+
     [System.Serializable]
     public class Indicator
     {

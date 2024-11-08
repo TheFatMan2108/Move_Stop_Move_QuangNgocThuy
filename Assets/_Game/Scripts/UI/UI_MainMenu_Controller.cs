@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UI_MainMenu_Controller : MonoBehaviour
+public class UI_MainMenu_Controller : MonoBehaviour,IStateGame
 {
     [SerializeField] Slider exp;
     [SerializeField] TextMeshProUGUI txtCoin,txtHightScore;
@@ -18,8 +18,12 @@ public class UI_MainMenu_Controller : MonoBehaviour
         btnMute.onClick.AddListener(UpdateMute);
         btnChoiceSkinLeft.onClick.AddListener(UpdateChoiceSkinLeft);
         btnChoiceSkinRight.onClick.AddListener(UpdateChoiceSkinRight);
-        btnPlay.onClick.AddListener(StartGame);
+        btnPlay.onClick.AddListener(StartGameButon);
         edtName.onEndEdit.AddListener(UpdateNamePlayer);
+    }
+    private void Start()
+    {
+        GameManager.Instance.AddStateGame(this);
     }
     public void UpdateEXP(float expPoint)
     {
@@ -44,19 +48,31 @@ public class UI_MainMenu_Controller : MonoBehaviour
     {
         // logic skin right
     }
-    public void StartGame()
+    public void StartGameButon()
     {
         // logic start game
-        GameManager.Instance.StartGame();
+        GameManager.Instance.OnStartGame();
         transform.GetChild(0).gameObject.SetActive(false);
         UI_Manager.instance.UIInGame.UpdateAliveUI(true);
 
     }
-    public void BackToMainMenu() => transform.GetChild(0).gameObject.SetActive(true);
     public void UpdateNamePlayer(string name)
     {
         // logic update
-        Debug.Log(name);
+        GameManager.Instance.OnChangeName(name);
     }
 
+    public void StopGame()
+    {
+        transform.GetChild(0).gameObject.SetActive(true);
+    }
+    private void OnDestroy()
+    {
+        GameManager.Instance.RemoveStateGame(this);
+    }
+
+    public void StartGame()
+    {
+        
+    }
 }
