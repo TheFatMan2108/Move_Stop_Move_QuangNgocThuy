@@ -113,5 +113,6 @@ public class OffscreenIndicator : MonoBehaviour
         public Image image;
         [HideInInspector]
         public RectTransform rectTransform;
+
     }
 }

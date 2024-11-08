@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,7 +8,7 @@ public class Player : CharacterBase, IMaker
     public static Player player {  get; private set; }
     public CharacterController controller;
     public Transform body;
-    public GameObject maker;
+    public GameObject nameTagUI,makerUI;
     public Vector3 directionMove { get; private set; } = Vector3.zero;
     public Vector3 oldDirectionMove { get; private set; } = Vector3.zero;
     #region State
@@ -21,6 +22,10 @@ public class Player : CharacterBase, IMaker
     private PlayerController playerController;
     public InputAction move { get; private set; }
     #endregion
+    string nameKilled = "";
+    Color killedColor = Color.white;
+    float coin = 0;
+    float star = 0;
     protected override void Awake()
     {
         base.Awake();
@@ -55,7 +60,6 @@ public class Player : CharacterBase, IMaker
         if (this.score < score)
         {
             // thuc hien show pop up khi dat duoc do cao moi
-            Debug.Log(score);
         }
         base.UpSize(score);
     }
@@ -75,6 +79,7 @@ public class Player : CharacterBase, IMaker
         base.ChangeWeapon(weaponType);
 
     }
+
 
     public virtual GameObject FindTarget()
     {
@@ -150,12 +155,12 @@ public class Player : CharacterBase, IMaker
 
     public void ShowMaker()
     {
-        maker.SetActive(true);
+        makerUI.SetActive(true);
     }
 
     public void HideMaker()
     {
-        maker.SetActive(false);
+        makerUI.SetActive(false);
     }
 
     public override void TriggerCalled()
@@ -167,12 +172,54 @@ public class Player : CharacterBase, IMaker
     {
         oldDirectionMove = old;
     }
-
+    public void SetNameKilled(string name)=>nameKilled = name;
+    public void SetKillerColor(Color color)=>killedColor = color;
     public override void Dead()
     {
         base.Dead();
         controllerState.ChangeState(dead);
         controller.enabled = false;
         DisableMove();
+    }
+
+    public override void DeadTrigger()
+    {
+        base.DeadTrigger();
+        UI_Manager.instance.UpdateInfoEndGame(GameManager.Instance.GetScore(), nameKilled, killedColor, star, coin);
+    }
+
+    public override void UpdateStar(float star)
+    {
+       base.UpdateStar(star);
+       this.star += star;
+    }
+
+    public override void UpdateCoin(float coin)
+    {
+      coin = Mathf.Floor(coin);
+      this.coin += coin;
+    }
+    public void SetPosition(Vector3 position,bool isActiveCharacterController,Vector3 direction)
+    {
+        transform.position = position;
+        controller.enabled = isActiveCharacterController;
+        nameTagUI.SetActive(isActiveCharacterController);
+        player.body.localRotation = Quaternion.LookRotation(direction);
+        if (isActiveCharacterController)
+        {
+            EnableMove();
+
+        }
+        else
+        {
+            DisableMove();
+        }
+    }
+    public void ResetPlayer()
+    {
+        gameObject.SetActive(true);
+        controller.enabled = true;
+        controllerState.ChangeState(idle);
+        
     }
 }

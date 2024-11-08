@@ -130,5 +130,9 @@ public class CharacterBase : MonoBehaviour
     public virtual void DeadTrigger()
     {
         // do something
+
     }
+    public virtual void UpdateStar(float star) { }
+    public virtual void UpdateCoin(float coin) { }
+    public ColorItemData GetColorItemData() => myColor;
 }

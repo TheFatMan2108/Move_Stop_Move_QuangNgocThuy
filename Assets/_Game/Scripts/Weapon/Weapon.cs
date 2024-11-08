@@ -38,9 +38,17 @@ public class Weapon : MonoBehaviour
         if(other.TryGetComponent(out CharacterBase character))
         {
             if (character == null||chara==character) return;
+            chara.UpdateStar(1);
+            chara.UpdateCoin(distance);
+            if (character.TryGetComponent(out Player player) && player != null)
+            {
+                player.SetNameKilled(chara.nameCharacter);
+                player.SetKillerColor(chara.GetColorItemData().color);
+            }
             character.Dead();
             gameObject.SetActive(false);
             chara.UpSize((int)distance);
+           
         };
     }
 }
