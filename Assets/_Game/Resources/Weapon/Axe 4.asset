@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61c874755edf491428cdf4a6f1356de7, type: 3}
   m_Name: Axe 4
   m_EditorClassIdentifier: 
-  baseWeapon: {fileID: 5335099508883907745, guid: 038134d74243a774cb93092f36037a97, type: 3}
-  nameWeapon: Axe4
-  weaponType: 3
+  nameItem: Axe4
+  icon: {fileID: 21300000, guid: 724e4328a30d97c4fa51f406c3ff007d, type: 3}
   price: 1
+  baseWeapon: {fileID: 5335099508883907745, guid: 038134d74243a774cb93092f36037a97, type: 3}
+  weaponType: 3

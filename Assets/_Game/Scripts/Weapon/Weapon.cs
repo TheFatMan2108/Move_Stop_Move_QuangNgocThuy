@@ -5,11 +5,12 @@ public class Weapon : MonoBehaviour
 {
     public float speed = 10f;
     public float euler = 10;
+    public WeaponType type;
+    public float distance = 0f;
     private Vector3 target;
     private CharacterBase chara;
     private Rigidbody rb;
-    public WeaponType type;
-    public float distance = 0f;
+    private WeaponCharacter weaponCharacter;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -18,7 +19,7 @@ public class Weapon : MonoBehaviour
     {
         rb.velocity = target.normalized*speed;
         transform.eulerAngles = new Vector3(90, 0, euler);euler += 1000 * Time.deltaTime;
-        if(Vector3.Distance(transform.position,chara.transform.position)>=chara.radiusAttack+5)gameObject.SetActive(false);
+        if(Vector3.Distance(transform.position,chara.transform.position)>=chara.radiusAttack+5) weaponCharacter.AddToPool(gameObject);  
     }
 
     public void SetTarget(Vector3 target)
@@ -32,6 +33,7 @@ public class Weapon : MonoBehaviour
     }
     public void SetType(WeaponType type) => this.type = type; 
     public void SetUsingPeopel(CharacterBase character) => this.chara = character;
+    public void SetWeaponCharacter(WeaponCharacter weaponCharacter)=>this.weaponCharacter = weaponCharacter;
     private void OnTriggerEnter(Collider other)
     {
         
@@ -46,7 +48,7 @@ public class Weapon : MonoBehaviour
                 player.SetKillerColor(chara.GetColorItemData().color);
             }
             character.Dead();
-            gameObject.SetActive(false);
+            weaponCharacter.AddToPool(gameObject);
             chara.UpSize((int)distance);
            
         };

@@ -11,4 +11,5 @@ public class CacheString
     public const string DataHatAddress = "Data1";
     public const string DataPantAddress = "Data1";
     public const string DataColorAddress = "Data1";
+    public const string KEY_DATA = "265656562786786525645344";
 }

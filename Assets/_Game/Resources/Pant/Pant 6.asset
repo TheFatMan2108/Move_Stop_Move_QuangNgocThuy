@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6cb3fb2851daf840a71aac105ebf962, type: 3}
   m_Name: Pant 6
   m_EditorClassIdentifier: 
-  basePant: {fileID: 2100000, guid: 64165062f254ca544a886726b91b7a82, type: 2}
-  namePant: Pokemon
-  pantType: 5
+  nameItem: Pokemon
+  icon: {fileID: 21300000, guid: a482b056a7db15c449864b0f6737a4cb, type: 3}
   price: 1
+  basePant: {fileID: 2100000, guid: 64165062f254ca544a886726b91b7a82, type: 2}
+  pantType: 5

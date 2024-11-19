@@ -1,10 +1,14 @@
 using System.Collections;
-
+using System.Collections.Generic;
+using System.Linq;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
     public static DataManager instance {  get; private set; }
+    List<IDataSave> datas = new List<IDataSave>();
+    DataPlayer data;
     WeaponData weaponData;
     HatData hatData;
     PantData pantData;
@@ -13,6 +17,16 @@ public class DataManager : MonoBehaviour
     {
         if (instance == null)instance = this;
         else Destroy(gameObject);
+        string dataString = PlayerPrefs.GetString(CacheString.KEY_DATA,"");
+        if(dataString.Equals(""))
+            data = new DataPlayer();
+        else data = JsonUtility.FromJson<DataPlayer>(dataString);
+        datas = FindAllDataPersistenceObjects();
+        
+    }
+    private void Start()
+    {
+        LoadIDataSave();
     }
     public WeaponData GetWeaponDataOS()
     {
@@ -38,5 +52,32 @@ public class DataManager : MonoBehaviour
             colorData = Resources.Load<ColorData>(string.Format("Data/ColorData/{0}", CacheString.DataColorAddress));
         return colorData;
     }
+    //
+    public void AddIDataSave(IDataSave dataSave)=>datas.Add(dataSave);
+    public void RemoveIDataSave(IDataSave dataSave)=>datas.Remove(dataSave);
 
+    public void SaveIDataSave()
+    {
+        foreach (var item in datas)
+        {
+            item.Save(ref data);
+        }
+        string dataString = JsonUtility.ToJson(data);
+        PlayerPrefs.SetString(CacheString.KEY_DATA,dataString);
+    }
+    public void LoadIDataSave()
+    {
+        foreach (var item in datas)
+        {
+            item.Load(data);
+        }
+    }
+    private List<IDataSave> FindAllDataPersistenceObjects()
+    {
+        IEnumerable<IDataSave> dataPersistenceObjects = FindObjectsOfType<MonoBehaviour>(true)
+            .OfType<IDataSave>();
+
+        return new List<IDataSave>(dataPersistenceObjects);
+    }
+    public int GetMaxScore()=>data.highScore;
 }

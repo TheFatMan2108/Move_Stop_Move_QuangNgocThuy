@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6cb3fb2851daf840a71aac105ebf962, type: 3}
   m_Name: Pant 5
   m_EditorClassIdentifier: 
-  basePant: {fileID: 2100000, guid: 470a2cae3566ae441a5264b2cc8a328d, type: 2}
-  namePant: Onion
-  pantType: 4
+  nameItem: Onion
+  icon: {fileID: 21300000, guid: be770e2a4bda55147bff7cac14cb8b34, type: 3}
   price: 1
+  basePant: {fileID: 2100000, guid: 470a2cae3566ae441a5264b2cc8a328d, type: 2}
+  pantType: 4

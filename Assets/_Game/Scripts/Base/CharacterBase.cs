@@ -1,16 +1,16 @@
-
+﻿
 using System;
 using UnityEngine;
 using RandomNameGeneratorLibrary;
+using System.Collections;
+using System.Collections.Generic;
 
-[RequireComponent(typeof(WeaponCharacter))]
 public class CharacterBase : MonoBehaviour
 {
     [Header("Info")]
     public string nameCharacter = string.Empty;
     public float size = 1;
     public int score = 0;
-    public WeaponCharacter weapon;
     public ControllerState controllerState;
     public float speed = 10f;
     public float radiusAttack = 4f;
@@ -26,13 +26,15 @@ public class CharacterBase : MonoBehaviour
     [SerializeField] protected SkinnedMeshRenderer pant;
     //
     [SerializeField] protected ColorType curentSkin;
-    [SerializeField] protected WeaponType curentWeapon;
-    protected GameObject weaponObj;
-    protected GameObject hatObj;
-    protected ColorItemData myColor;
-    [SerializeField] protected HatType curentHat;
-    [SerializeField] protected PantType curentPant;
+    [SerializeField] protected WeaponType curentTypeWeapon;
+    [SerializeField] protected HatType curentTypeHat;
+    [SerializeField] protected PantType curentTypePant;
     [SerializeField] protected UICharacter uICharacter;
+    protected List<WeaponCharacter> weaponObjs = new List<WeaponCharacter>();
+    protected WeaponCharacter weaponCurrent;
+    protected List<GameObject> hatObjs = new List<GameObject>();
+    protected GameObject hatCurrent;
+    protected ColorItemData myColor;
     #endregion
     protected Animator animator;
     protected virtual void Awake()
@@ -42,25 +44,33 @@ public class CharacterBase : MonoBehaviour
 
     private void OnInit()
     {
-        weapon = GetComponent<WeaponCharacter>();
         controllerState = new ControllerState();
         animator = GetComponentInChildren<Animator>();
-        curentWeapon = weapon.weaponType;
         animator.transform.localScale = new Vector3(size, size, size);
     }
 
     protected virtual void Start()
     {
         dataManager = DataManager.instance;
-        ChangeWeapon(curentWeapon);
-        ChangeHat(curentHat);
-        ChangePant(curentPant);
+        ChangeWeapon(curentTypeWeapon);
+        ChangeHat(curentTypeHat);
+        ChangePant(curentTypePant);
         ChangeSkin(curentSkin);
         uICharacter.SetLevel(score.ToString());
         uICharacter.SetName(nameCharacter);
         SetColorUI();
+        StartCoroutine(CheckDataManager());
+        //yield return new WaitUntil(()=> dataManager);
+
     }
 
+    
+    IEnumerator CheckDataManager()
+    {
+        yield return new WaitUntil(() => dataManager);
+        Debug.Log("Để khi nào hết null thì chạy");  
+
+    }
     protected void RandomName()
     {
         var generator = new PersonNameGenerator();
@@ -78,25 +88,48 @@ public class CharacterBase : MonoBehaviour
         materials[0] = myColor.material;
         skin.materials = materials;
     }
-    protected virtual void ChangeWeapon(WeaponType weaponType)
+    public virtual void ChangeWeapon(WeaponType weaponType)
     {
-        if (weaponObj != null)
-            weaponObj.SetActive(false);
-        weaponObj = Instantiate(dataManager.GetWeaponDataOS().GetWeapon(weaponType), rightHand);
-        this.curentWeapon = weaponType;
-        weapon.weaponType = weaponType;
+        WeaponCharacter weaponObj = CheckWeaponNull(weaponType);
+        if (weaponCurrent != null) weaponCurrent.gameObject.SetActive(false);
+        if (weaponObjs.Count <= 0 || weaponObj==null)
+        {
+            weaponObj = Instantiate(dataManager.GetWeaponDataOS().GetWeapon(weaponType), rightHand).AddComponent<WeaponCharacter>();
+            weaponObj.SetUpWeapon(weaponType,rightHand);
+            weaponObjs.Add(weaponObj);
+        }
+        else
+        {
+            weaponObj.gameObject.SetActive(true);
+        }
+        this.curentTypeWeapon = weaponType;
+        weaponCurrent = weaponObj;
     }
-    protected virtual void ChangeHat(HatType hatType)
+    public WeaponCharacter CheckWeaponNull(WeaponType weaponType)
     {
-        if (hatObj != null)
-            hatObj.SetActive(false);
-        hatObj = Instantiate(dataManager.GetHatDataOS().GeHat(hatType), hat);
+        foreach (var item in weaponObjs)
+        {
+            if (item.weaponType == weaponType)
+            {
+                return item;
+            }
+        }
+        return null;
     }
-    protected virtual void ChangePant(PantType pantType)
+    public virtual void ChangeHat(HatType hatType)
+    {
+        // do lười nên không thực hiện pool ở đây =)))
+        if (hatCurrent != null)
+            Destroy(hatCurrent);
+        hatCurrent = Instantiate(dataManager.GetHatDataOS().GeHat(hatType), hat);
+        curentTypeHat = hatType;
+    }
+    public virtual void ChangePant(PantType pantType)
     {
         Material[] materials = pant.materials;
         materials[0] = dataManager.GetPantDataOS().GetPant(pantType);
         pant.materials = materials;
+        curentTypePant = pantType;
     }
 
     public virtual void UpSize(int score)
@@ -114,7 +147,7 @@ public class CharacterBase : MonoBehaviour
     public virtual void Attack()
     {
         if (target == null) return;
-        weapon.Shoot(target.transform.position, this);
+        weaponCurrent.Shoot(target.transform.position, this);
     }
     public virtual void Dead()
     {

@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6cb3fb2851daf840a71aac105ebf962, type: 3}
   m_Name: Pant 7
   m_EditorClassIdentifier: 
-  basePant: {fileID: 2100000, guid: 5de7c5e2a03647c41959fb53427f62d6, type: 2}
-  namePant: Rainbow
-  pantType: 6
+  nameItem: Rainbow
+  icon: {fileID: 21300000, guid: 17737506398ad284aa00a46f0508ac61, type: 3}
   price: 1
+  basePant: {fileID: 2100000, guid: 5de7c5e2a03647c41959fb53427f62d6, type: 2}
+  pantType: 6

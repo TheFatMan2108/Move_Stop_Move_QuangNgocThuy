@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6cb3fb2851daf840a71aac105ebf962, type: 3}
   m_Name: Pant 2
   m_EditorClassIdentifier: 
-  basePant: {fileID: 2100000, guid: 0bb76a5f50944ae47b52faecf46eb943, type: 2}
-  namePant: ChamBi
-  pantType: 1
+  nameItem: ChamBi
+  icon: {fileID: 21300000, guid: 6d8c21d8e55123441ba02ac0fce3d675, type: 3}
   price: 1
+  basePant: {fileID: 2100000, guid: 0bb76a5f50944ae47b52faecf46eb943, type: 2}
+  pantType: 1

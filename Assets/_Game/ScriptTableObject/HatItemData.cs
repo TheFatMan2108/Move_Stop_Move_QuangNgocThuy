@@ -1,17 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [CreateAssetMenu(fileName = "Weapon Item", menuName = "Data/Hat")]
-public class HatItemData : ScriptableObject
+public class HatItemData : ItemDataBase
 {
     public GameObject baseHat;
-    public string nameHat;
     public HatType hatType;
-    public int price = 1;
 
-    private void OnValidate()
+    protected void OnValidate()
     {
-        nameHat = hatType.ToString();
+        nameItem = hatType.ToString();
     }
 }

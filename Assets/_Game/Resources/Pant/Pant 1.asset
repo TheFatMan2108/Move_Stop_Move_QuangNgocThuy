@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6cb3fb2851daf840a71aac105ebf962, type: 3}
   m_Name: Pant 1
   m_EditorClassIdentifier: 
-  basePant: {fileID: 2100000, guid: 150a3ad4f9c7c1243a3cdb434a91f7df, type: 2}
-  namePant: BatMan
-  pantType: 0
+  nameItem: BatMan
+  icon: {fileID: 21300000, guid: 0806d2ad9e543b64dab8a6583c3b2039, type: 3}
   price: 1
+  basePant: {fileID: 2100000, guid: 150a3ad4f9c7c1243a3cdb434a91f7df, type: 2}
+  pantType: 0

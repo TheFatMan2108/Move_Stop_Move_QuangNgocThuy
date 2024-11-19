@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour, IEndGamesable,IStateGame
+public class GameManager : MonoBehaviour, IEndGamesable,IStateGame,IDataSave
 {
     public static GameManager Instance { get; private set; }
-
+    public int fps = 60;
     public List<Transform> startPoints = new List<Transform>();
     public Transform mainMenu;
     public GameObject npcs;
@@ -20,28 +20,28 @@ public class GameManager : MonoBehaviour, IEndGamesable,IStateGame
     public int totalNPC = 10;
     public TextMeshProUGUI txtScore;
     private Player player;
+    public int coin;
+    public int level = 1;
+    int fpsCurent;
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+        fpsCurent = fps;
+        Application.targetFrameRate = fpsCurent;
         ShowScoreUI();
         AddEndGamesable(this);
         AddStateGame(this);
-        
+        StartCoroutine(CheckNull());  
     }
-    private void Start()
-    {
-        player = Player.player;
-        player.SetPosition(mainMenu.position, false);
-
-    }
-
-
+    
     public void AddSpawn(ISpawnable npc)
     {
         if (npcCount < 1&&!player.isDead)
         {
-            Debug.Log("Win");
+            player.Win();
+            level++;
+            
             return;
         }
         spawnables.Add(npc);
@@ -97,8 +97,6 @@ public class GameManager : MonoBehaviour, IEndGamesable,IStateGame
     {
         UI_Manager.instance.UpdateAlivePeopel(GetScore());
     }
-
-
     public void SpawnNPC(ISpawnable npc)
     {
         if (npcCount < totalNPC||player.isDead) return;
@@ -130,15 +128,52 @@ public class GameManager : MonoBehaviour, IEndGamesable,IStateGame
     {
         // code nay hoi dan can sua lai
         player.SetPosition(startPoints[Random.Range(0, startPoints.Count)].position, true);
-        player.isDead = false;
-        npcCount = 20;
+        npcCount = 20+ScalePeopelAmount();
         ShowScoreUI();
         OnSpawn();
     }
+
+    private int ScalePeopelAmount()
+    {
+        return (int)Mathf.Round((4*(Mathf.Pow(level,3)))/5);
+    }
+
     public void StopGame()
     {
         player.SetPosition(mainMenu.position, true);
 
+    }
+    IEnumerator CheckNull()
+    {
+        yield return new WaitUntil(() => UI_Manager.instance);
+        UI_Manager.instance.UIMainMenu.UpdateCoin(coin);
+        yield return new WaitUntil(() => Player.instance);
+        player = Player.instance;
+        player.SetPosition(mainMenu.position, false);
+        player.isDead = true;
+        //npcCount = 0;
+    }
+
+    public void UpdateCoin(int coin)
+    {
+        this.coin += coin;
+        UI_Manager.instance.UIMainMenu.UpdateCoin(this.coin);
+        DataManager.instance.SaveIDataSave();
+    }
+
+    public void Save(ref DataPlayer data)
+    {
+        data.coin = coin;
+        data.level = level;
+        data.highScore =(int) GetScore();
+    }
+
+    public void Load(DataPlayer data)
+    {
+        coin = data.coin;
+        level = data.level;
+        UI_Manager.instance.UIMainMenu.UpdateCoin(this.coin);
+        UI_Manager.instance.UIMainMenu.UpdateHighScore(data.highScore);
     }
 }
 

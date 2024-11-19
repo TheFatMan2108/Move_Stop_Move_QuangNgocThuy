@@ -10,6 +10,8 @@ public class PlayerDanceState : PlayerStateParent
     public override void Enter()
     {
         base.Enter();
+        player.isWin = true;
+        player.DeadTrigger();
     }
     public override void Update()
     {
@@ -18,5 +20,6 @@ public class PlayerDanceState : PlayerStateParent
     public override void Exit()
     {
         base.Exit();
+        player.isWin = false;
     }
 }

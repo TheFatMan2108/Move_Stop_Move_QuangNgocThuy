@@ -8,17 +8,19 @@ public class UI_MainMenu_Controller : MonoBehaviour,IStateGame
 {
     [SerializeField] Slider exp;
     [SerializeField] TextMeshProUGUI txtCoin,txtHightScore;
-    [SerializeField] Button btnMute,btnChoiceSkinLeft,btnChoiceSkinRight, btnPlay;
+    [SerializeField] Button btnMute,btnChoiceSkinLeft,btnChoiceSkinRight, btnPlay,btnShop;
     [SerializeField] TMP_InputField edtName;
     [SerializeField] Image muteImgCurent;
     [SerializeField] Sprite muteImg,notMuteImg;
-    bool isMute = true;
+    [SerializeField] GameObject shopObject;
+    bool isMute = true; 
     private void Awake()
     {
         btnMute.onClick.AddListener(UpdateMute);
         btnChoiceSkinLeft.onClick.AddListener(UpdateChoiceSkinLeft);
         btnChoiceSkinRight.onClick.AddListener(UpdateChoiceSkinRight);
         btnPlay.onClick.AddListener(StartGameButon);
+        btnShop.onClick.AddListener(ShowShop);
         edtName.onEndEdit.AddListener(UpdateNamePlayer);
     }
     private void Start()
@@ -30,7 +32,8 @@ public class UI_MainMenu_Controller : MonoBehaviour,IStateGame
         exp.value = expPoint;
         // tinh gioi han abc
     }
-
+    public void CloseShop()=>shopObject.SetActive(false);
+    public void ShowShop()=>shopObject.SetActive(true);
     public void UpdateCoin(float coin)=>txtCoin.text = coin.ToString("n0");
     public void UpdateHighScore(float hightScore) => txtHightScore.text = string.Format("Survival - Best: #{0}",hightScore);
     public void UpdateMute()
@@ -43,10 +46,12 @@ public class UI_MainMenu_Controller : MonoBehaviour,IStateGame
     public void UpdateChoiceSkinLeft()
     {
         // logic skin left
+        Player.instance.UpdateChoiceSkinLeft();
     }
     public void UpdateChoiceSkinRight()
     {
         // logic skin right
+        Player.instance.UpdateChoiceSkinRight();
     }
     public void StartGameButon()
     {
@@ -56,12 +61,17 @@ public class UI_MainMenu_Controller : MonoBehaviour,IStateGame
         UI_Manager.instance.UIInGame.UpdateAliveUI(true);
 
     }
+    public void SetNamePlayer(string name)=>edtName.text = name;
     public void UpdateNamePlayer(string name)
     {
         // logic update
         GameManager.Instance.OnChangeName(name);
     }
 
+    public void StartGame()
+    {
+        
+    }
     public void StopGame()
     {
         transform.GetChild(0).gameObject.SetActive(true);
@@ -70,9 +80,5 @@ public class UI_MainMenu_Controller : MonoBehaviour,IStateGame
     {
         GameManager.Instance.RemoveStateGame(this);
     }
-
-    public void StartGame()
-    {
         
-    }
 }

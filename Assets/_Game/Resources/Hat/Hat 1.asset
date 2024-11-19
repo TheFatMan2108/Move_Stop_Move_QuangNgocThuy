@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2258bf3bd6093a44582308c034bd8dff, type: 3}
   m_Name: Hat 1
   m_EditorClassIdentifier: 
-  baseHat: {fileID: 2892491050422788774, guid: 3ad865a0262a8b743b578e530cf80c5c, type: 3}
-  nameHat: Arrow
-  hatType: 0
+  nameItem: Arrow
+  icon: {fileID: 21300000, guid: 2f8937590677b044b8619858abca9ecf, type: 3}
   price: 1
+  baseHat: {fileID: 2892491050422788774, guid: 3ad865a0262a8b743b578e530cf80c5c, type: 3}
+  hatType: 0

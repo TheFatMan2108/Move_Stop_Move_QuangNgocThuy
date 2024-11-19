@@ -62,7 +62,7 @@ public class NPC : CharacterBase,IMaker,ISpawnable,IEndGamesable,IStateGame
     {
         base.Update();
         controllerState.curentState.Update();
-        if (Vector3.Distance(Player.player.transform.position, transform.position) > Player.player.radiusAttack)
+        if (Vector3.Distance(Player.instance.transform.position, transform.position) > Player.instance.radiusAttack)
         {
             HideMaker();
         }
@@ -206,6 +206,7 @@ public class NPC : CharacterBase,IMaker,ISpawnable,IEndGamesable,IStateGame
         // giảm lại kích thước và điểm
         score = 0;
         size = 1;
+        uICharacter.SetLevel(score.ToString());
         animator.transform.localScale = new Vector3(size, size, size);
         controllerState.ChangeState(dead);
     }
